@@ -19,24 +19,20 @@ pandaId = p.loadURDF("franka_panda/panda.urdf", [0, 0, 0.625], useFixedBase=True
 ee_index = 11
 orientation = p.getQuaternionFromEuler([math.pi, 0, 0])
 
-# ===== 先让手臂到起始位置 =====
-center = [0.3, 0.0, 1.1]  # ✅ 圆心移近、降低
-radius = 0.15               # ✅ 半径缩小
+# ===== 圆参数 =====
+center = [0.3, 0.0, 1.1]
+radius = 0.15
 
-start_x = center[0] + radius
-start_y = center[1]
-start_z = center[2]
-
+# ===== 先跳到起始位置 =====
 jointPoses = p.calculateInverseKinematics(
     pandaId, ee_index,
-    [start_x, start_y, start_z],
+    [center[0] + radius, center[1], center[2]],
     orientation,
     maxNumIterations=200
 )
 for i in range(7):
-    p.resetJointState(pandaId, i, jointPoses[i])  # ✅ 直接跳到起始位置
+    p.resetJointState(pandaId, i, jointPoses[i])
 
-# 稳定一下
 for _ in range(100):
     p.stepSimulation()
     time.sleep(1./240.)
@@ -44,7 +40,7 @@ for _ in range(100):
 print("开始画圆...")
 
 # ===== 画圆 =====
-for t in range(720):                              # ✅ 720步更平滑
+for t in range(720):
     angle = 2 * math.pi * t / 720
 
     x = center[0] + radius * math.cos(angle)
@@ -67,7 +63,7 @@ for t in range(720):                              # ✅ 720步更平滑
             force=500
         )
 
-    for _ in range(3):                           # ✅ 每步10次仿真，手臂跟得上
+    for _ in range(3):
         p.stepSimulation()
         time.sleep(1./240.)
 
