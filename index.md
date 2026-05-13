@@ -12,11 +12,13 @@
 
 # 课程作业目录
 
+- [Week 1：WSL 与 ROS2 安装](week1/)
 - [Week 2：WSL、Ubuntu 与 ROS2 环境配置](week2/)
 - [Week 3：GitHub SSH、VS Code 与 ROS2](week3/)
 - [Week 4：Python 与 PyBullet](week4/)
 - [Week 5：Linux 与机器人运动学](week5/)
 - [Week 8：Docker ROS2 环境](week8/)
+- [Week 9：ROS2 小乌龟与 Docker](week9/)
 - [Week 10：OpenCV 实验](week10/)
 
 ---
@@ -35,9 +37,10 @@
 
 # 关于我
 
+- 姓名：张皓然
+- 学号：20231877
 - GitHub：zone57
 - 课程：AI Robotics
-- 开发环境：ROS2 + Docker
 
 ---
 
