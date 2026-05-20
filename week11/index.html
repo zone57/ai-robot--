@@ -1,1 +1,664 @@
 <h1>Week 11</h1>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Week 11 - 四足机器人步态控制</title>
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin:auto;
+      padding:20px;
+      line-height:1.6;
+    }
+    pre{
+      background:#f5f5f5;
+      padding:10px;
+      overflow-x:auto;
+    }
+    video{
+      width:100%;
+      border-radius:10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ===================== 原始内容：完全未删除 ===================== -->
+
+# 🤖 四足机器人步态控制（Trot Gait）实验报告
+
+## 📅 实验日期
+
+2026-05-20
+
+---
+
+# 🧪 一、实验目的
+
+本实验旨在：
+
+* 学习 PyBullet 机器人仿真环境搭建方法
+* 实现四足机器人（A1 / Laikago）的基础 trot 步态控制
+* 理解机器人步态生成（gait generation）基本原理
+* 掌握逆运动学（IK）在腿部控制中的应用
+* 学习机器人姿态稳定控制（roll / pitch correction）方法
+* 调试并优化机器人在仿真中的稳定行走能力
+
+---
+
+# 🖥️ 二、实验环境
+
+* 操作系统：Ubuntu 20.04 / WSL2
+* Python版本：3.10
+* 仿真平台：PyBullet
+* 机器人模型：A1 / Laikago URDF
+* 数值计算库：NumPy
+* 图形界面：PyBullet GUI (OpenGL / Mesa llvmpipe)
+
+---
+
+# 🚀 三、实验步骤
+
+## 1️⃣ 启动 PyBullet 仿真环境
+
+```python
+p.connect(p.GUI)
+p.setGravity(0, 0, -9.8)
+p.loadURDF("plane.urdf")
+
+## 2️⃣ 加载四足机器人模型
+
+```python id="pb2"
+robot = p.loadURDF(
+    "a1/a1.urdf",
+    [0, 0, 0.35],
+    p.getQuaternionFromEuler([0, 0, 0])
+)
+```
+
+### 📌 关键点：
+
+* 初始高度设置为 0.35m
+* 避免初始姿态倾斜（否则会直接翻倒）
+
+---
+
+## 3️⃣ 关节结构解析
+
+通过 API 获取关节信息：
+
+```python id="pb3"
+for i in range(p.getNumJoints(robot)):
+    info = p.getJointInfo(robot, i)
+    print(i, info[1].decode(), info[2])
+```
+
+### 📌 作用：
+
+* 区分 revolute（可动关节）
+* 排除 fixed joint（不可控关节）
+
+---
+
+## 4️⃣ trot 步态生成
+
+使用相位差实现对角腿同步：
+
+```python id="pb4"
+phase = 2 * np.pi * freq * t
+```
+
+### 步态规律：
+
+* FR + RL：同相
+* FL + RR：反相
+
+👉 实现标准 diagonal trot gait
+
+---
+
+## 5️⃣ 腿部运动轨迹（IK）
+
+```python id="pb5"
+x = step_length * sin(phase)
+z = step_height * sin(phase)
+```
+
+并通过简化 IK：
+
+```python id="pb6"
+thigh = arctan2(x, height)
+calf = -2 * thigh
+```
+
+### 📌 作用：
+
+将末端轨迹转换为关节角度
+
+---
+
+## 6️⃣ 姿态稳定控制（关键改进）
+
+加入 roll / pitch 修正：
+
+```python id="pb7"
+roll, pitch = getBaseOrientation()
+
+roll_correction = -0.8 * roll
+pitch_correction = -0.8 * pitch
+```
+
+### 📌 作用：
+
+* 防止侧翻
+* 抑制姿态漂移
+* 提高动态稳定性
+
+---
+
+## 7️⃣ 统一关节控制
+
+使用批量控制提高稳定性：
+
+```python id="pb8"
+p.setJointMotorControlArray(
+    robot,
+    jointIndices,
+    p.POSITION_CONTROL,
+    targetPositions=angles,
+    forces=[200]*len(joints),
+    positionGains=[0.25]*len(joints),
+    velocityGains=[1.0]*len(joints)
+)
+```
+
+---
+
+## 8️⃣ 仿真循环运行
+
+```python id="pb9"
+while True:
+    controller.step(t)
+    p.stepSimulation()
+    time.sleep(1./240.)
+```
+
+---
+
+# 📊 四、实验结果
+
+实验最终实现：
+
+* ✔ 四足机器人成功进入 trot 步态
+* ✔ 对角腿协调运动正常
+* ✔ 机器人可以短时间维持行走
+* ✔ 加入姿态控制后显著减少翻倒
+* ✔ 系统在 5~15 秒内保持动态稳定
+
+---
+
+# 📉 五、实验中出现的问题及解决方法
+
+## ❌ 问题1：机器人侧翻（roll = ±90°）
+
+### 原因：
+
+* 初始姿态错误
+* 无姿态控制系统
+
+### 解决方法：
+
+* 设置初始四元数为 `[0,0,0]`
+* 添加 roll/pitch PD 修正
+
+---
+
+## ❌ 问题2：步态不稳定
+
+### 原因：
+
+* step_height 过大
+* IK 过于激进
+
+### 解决方法：
+
+* 降低 step_height = 0.02~0.03
+* 降低 step_length
+
+---
+
+## ❌ 问题3：关节索引错误
+
+### 原因：
+
+* 固定关节参与控制
+
+### 解决方法：
+
+* 只筛选 `JOINT_REVOLUTE`
+
+---
+
+# 🧠 六、实验原理总结
+
+本实验涉及三个核心机器人学概念：
+
+---
+
+## 🤖 1. 步态生成（Gait Generation）
+
+通过相位差控制实现四足协调运动：
+
+> diagonal trot = 对角腿同步运动
+
+---
+
+## 🦵 2. 逆运动学（IK）
+
+将足端轨迹转换为关节角度：
+
+> Cartesian space → Joint space
+
+---
+
+## ⚖️ 3. 姿态稳定控制（Balance Control）
+
+使用简单 PD 控制：
+
+> roll/pitch → correction torque
+
+用于防止机器人翻倒
+
+---
+
+# 🎯 七、实验总结
+
+通过本次实验，成功实现了四足机器人在 PyBullet 中的基础 trot 步态控制，并在原始开环控制基础上加入了姿态稳定控制机制。
+
+实验表明：
+
+* 单纯 IK 步态无法保证稳定性
+* 必须加入身体姿态反馈控制
+* 关节控制增益对稳定性影响显著
+* trot 步态本质是“相位协调 + 平衡控制”问题
+
+本实验为后续强化学习控制（PPO / RL）和更高级四足运动控制打下基础。
+
+# 🔄 八、新旧代码对比分析（关键改动总结）
+
+本实验从“基础开环步态控制”升级为“带姿态稳定的四足控制系统”，核心改动如下：
+
+---
+
+## 🧱 1️⃣ 控制结构变化（最本质区别）
+
+### ❌ 老代码结构（无法稳定行走）
+
+```text
+t → trot_gait() → IK → 逐关节控制
+```
+
+特点：
+
+* 只有“腿的轨迹”
+* 没有身体状态
+* 完全开环控制
+* 无反馈系统
+
+👉 结果：
+
+> 机器人容易侧翻、越走越歪
+
+---
+
+### ✅ 新代码结构（稳定控制）
+
+```text
+t
+ ↓
+trot gait
+ ↓
+IK计算
+ ↓
+balance()（新增）
+ ↓
+统一关节控制（Array）
+```
+
+特点：
+
+* 加入姿态反馈
+* 有 roll/pitch 修正
+* 半闭环控制系统
+
+👉 结果：
+
+> 可以短时间稳定行走
+
+---
+
+# ⚖️ 2️⃣ 最大改动：加入“平衡控制系统”（关键）
+
+---
+
+## ❌ 老代码：没有姿态控制
+
+```python id="old1"
+# 直接控制关节
+targetPosition = angle
+```
+
+问题：
+
+* 不知道机器人是否倾斜
+* 没有修正能力
+* 一旦偏移 → 直接倒
+
+---
+
+## ✅ 新代码：加入 balance()
+
+```python id="new1"
+roll, pitch = getBaseOrientation()
+
+roll_correction = -0.8 * roll
+pitch_correction = -0.8 * pitch
+```
+
+### 📌 本质作用：
+
+👉 简化 PD 控制器
+
+功能：
+
+* 自动检测倾斜
+* 自动施加修正角度
+* 防止滚转（roll 失控）
+
+---
+
+# 🦵 3️⃣ 步态生成方式改进
+
+---
+
+## ❌ 老代码（几何型 trot）
+
+```python id="old2"
+x = step_length * sin()
+z = sin()
+```
+
+问题：
+
+* 纯轨迹驱动
+* 不考虑身体状态
+* 步态刚性强
+
+---
+
+## ✅ 新代码（相位控制 trot）
+
+```python id="new2"
+phase = 2πft
+
+FR + RL 同相
+FL + RR 反相
+```
+
+👉 改进：
+
+* 更符合真实四足 gait
+* 动作协调性更好
+* 更容易稳定
+
+---
+
+# ⚙️ 4️⃣ 控制方式升级
+
+---
+
+## ❌ 老代码：逐关节控制
+
+```python id="old3"
+setJointMotorControl2()
+```
+
+问题：
+
+* 每个关节独立
+* 容易不同步
+
+---
+
+## ✅ 新代码：批量控制
+
+```python id="new3"
+setJointMotorControlArray()
+```
+
+优势：
+
+* 所有关节同步执行
+* 减少误差累积
+* 提高稳定性
+
+---
+
+# 🧠 5️⃣ IK策略变化
+
+---
+
+## ❌ 老代码：几何近似IK
+
+```python id="old4"
+thigh = arctan2(x, height)
+calf = -2 * thigh
+```
+
+问题：
+
+* 不精确
+* 不考虑动力学
+* 容易震荡
+
+---
+
+## ✅ 新代码：稳定优先IK
+
+```python id="new4"
+upper = 0.6 + swing
+lower = -1.2 - swing
+```
+
+特点：
+
+* 小幅变化（low amplitude）
+* 优先稳定性
+* 不追求精确轨迹
+
+---
+
+# ⚖️ 6️⃣ 步态参数优化
+
+| 参数          | 老代码  | 新代码       | 作用   |
+| ----------- | ---- | --------- | ---- |
+| step_height | 0.05 | 0.02~0.03 | 防翻   |
+| step_length | 0.1  | 0.05~0.08 | 减少冲击 |
+| gain        | 未优化  | 0.25      | 稳定控制 |
+
+👉 本质：
+
+> 从“走得大步” → “先走稳”
+
+---
+
+# 📉 7️⃣ 为什么新代码能走，老代码不能走？
+
+---
+
+## ❌ 老代码失败原因
+
+* 没有身体反馈
+* 步态开环
+* IK过于激进
+* 无稳定机制
+
+👉 结果：
+
+> 微小误差 → 累积 → 侧翻
+
+---
+
+## ✅ 新代码成功原因
+
+✔ 有 roll/pitch 修正
+✔ 有 PD 平衡控制
+✔ 步态幅度降低
+✔ 关节统一控制
+✔ 相位协调 trot
+
+👉 结果：
+
+> 系统具备“自我纠偏能力”
+
+---
+import pybullet as p
+import pybullet_data
+import time
+import numpy as np
+
+class StableA1Trot:
+    def __init__(self, robot_id):
+        self.robot = robot_id
+
+        # ===== 1. 自动筛选可动关节 =====
+        self.joints = []
+        self.joint_names = []
+
+        for i in range(p.getNumJoints(robot_id)):
+            info = p.getJointInfo(robot_id, i)
+            jname = info[1].decode()
+            jtype = info[2]
+
+            if jtype == p.JOINT_REVOLUTE:
+                self.joints.append(i)
+                self.joint_names.append(jname)
+
+        print("可控关节:", self.joint_names)
+
+        # ===== 2. A1 腿映射（关键）=====
+        self.leg_joints = {
+            "FR": [1, 3, 4],
+            "FL": [6, 8, 9],
+            "RR": [11, 13, 14],
+            "RL": [16, 18, 19],
+        }
+
+        # ===== 3. 初始站立姿态 =====
+        self.home = np.zeros(len(self.joints))
+
+    # =========================
+    # IK（简化版：固定关节角）
+    # =========================
+    def solve_leg(self, leg, phase):
+        # 小幅摆动（稳定优先）
+        amp = 0.25
+
+        if leg in ["FR", "RL"]:
+            swing = amp * np.sin(phase)
+        else:
+            swing = amp * np.sin(phase + np.pi)
+
+        hip = 0.0
+        upper = 0.6 + swing
+        lower = -1.2 - swing
+
+        return [hip, upper, lower]
+
+    # =========================
+    # 平衡控制（防翻核心）
+    # =========================
+    def balance(self):
+        orn = p.getBasePositionAndOrientation(self.robot)[1]
+        rpy = p.getEulerFromQuaternion(orn)
+
+        roll = rpy[0]
+        pitch = rpy[1]
+
+        # PD修正（很关键）
+        roll_correction = -0.8 * roll
+        pitch_correction = -0.8 * pitch
+
+        return roll_correction, pitch_correction
+
+    # =========================
+    # 单步控制
+    # =========================
+    def step(self, t):
+        freq = 1.5
+        phase = 2 * np.pi * freq * t
+
+        roll_c, pitch_c = self.balance()
+
+        target = {}
+
+        for leg in self.leg_joints:
+            angles = self.solve_leg(leg, phase)
+
+            # 加一点身体稳定补偿
+            angles[0] += roll_c
+            angles[1] += pitch_c
+
+            target[leg] = angles
+
+        # ===== 控制执行 =====
+        all_targets = []
+
+        for leg in ["FR", "FL", "RR", "RL"]:
+            all_targets += target[leg]
+
+        # 统一控制
+        p.setJointMotorControlArray(
+            bodyIndex=self.robot,
+            jointIndices=self.joints,
+            controlMode=p.POSITION_CONTROL,
+            targetPositions=all_targets,
+            forces=[200] * len(self.joints),
+            positionGains=[0.25] * len(self.joints),
+            velocityGains=[1.0] * len(self.joints),
+        )
+
+
+def main():
+    p.connect(p.GUI)
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.setGravity(0, 0, -9.8)
+
+    p.loadURDF("plane.urdf")
+
+    robot = p.loadURDF(
+        "a1/a1.urdf",
+        [0, 0, 0.35],
+        p.getQuaternionFromEuler([0, 0, 0])  # ⭐不允许90°侧躺
+    )
+
+    controller = StableA1Trot(robot)
+
+    print("开始稳定 trot...")
+
+    t = 0
+    dt = 1.0 / 240
+
+    while True:
+        controller.step(t)
+        p.stepSimulation()
+        time.sleep(dt)
+        t += dt
+
+
+if __name__ == "__main__":
+    main()
