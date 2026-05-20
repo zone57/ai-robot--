@@ -507,17 +507,139 @@ lower = -1.2 - swing
 > 系统具备“自我纠偏能力”
 
 ---
+import pybullet as p
+import pybullet_data
+import time
+import numpy as np
 
-# 🧠 一句话总结（老师最喜欢）
+class StableA1Trot:
+    def __init__(self, robot_id):
+        self.robot = robot_id
 
-👉 老代码是“动画驱动的腿”
-👉 新代码是“带反馈的机器人控制系统”
+        # ===== 1. 自动筛选可动关节 =====
+        self.joints = []
+        self.joint_names = []
 
----
+        for i in range(p.getNumJoints(robot_id)):
+            info = p.getJointInfo(robot_id, i)
+            jname = info[1].decode()
+            jtype = info[2]
 
-# 🚀 如果你想再加分（建议）
+            if jtype == p.JOINT_REVOLUTE:
+                self.joints.append(i)
+                self.joint_names.append(jname)
 
-你可以在报告最后加一句：
+        print("可控关节:", self.joint_names)
 
-> 本实验从开环步态控制升级为包含姿态反馈的半闭环控制系统，是机器人从“运动生成”走向“运动稳定控制”的关键一步。
+        # ===== 2. A1 腿映射（关键）=====
+        self.leg_joints = {
+            "FR": [1, 3, 4],
+            "FL": [6, 8, 9],
+            "RR": [11, 13, 14],
+            "RL": [16, 18, 19],
+        }
 
+        # ===== 3. 初始站立姿态 =====
+        self.home = np.zeros(len(self.joints))
+
+    # =========================
+    # IK（简化版：固定关节角）
+    # =========================
+    def solve_leg(self, leg, phase):
+        # 小幅摆动（稳定优先）
+        amp = 0.25
+
+        if leg in ["FR", "RL"]:
+            swing = amp * np.sin(phase)
+        else:
+            swing = amp * np.sin(phase + np.pi)
+
+        hip = 0.0
+        upper = 0.6 + swing
+        lower = -1.2 - swing
+
+        return [hip, upper, lower]
+
+    # =========================
+    # 平衡控制（防翻核心）
+    # =========================
+    def balance(self):
+        orn = p.getBasePositionAndOrientation(self.robot)[1]
+        rpy = p.getEulerFromQuaternion(orn)
+
+        roll = rpy[0]
+        pitch = rpy[1]
+
+        # PD修正（很关键）
+        roll_correction = -0.8 * roll
+        pitch_correction = -0.8 * pitch
+
+        return roll_correction, pitch_correction
+
+    # =========================
+    # 单步控制
+    # =========================
+    def step(self, t):
+        freq = 1.5
+        phase = 2 * np.pi * freq * t
+
+        roll_c, pitch_c = self.balance()
+
+        target = {}
+
+        for leg in self.leg_joints:
+            angles = self.solve_leg(leg, phase)
+
+            # 加一点身体稳定补偿
+            angles[0] += roll_c
+            angles[1] += pitch_c
+
+            target[leg] = angles
+
+        # ===== 控制执行 =====
+        all_targets = []
+
+        for leg in ["FR", "FL", "RR", "RL"]:
+            all_targets += target[leg]
+
+        # 统一控制
+        p.setJointMotorControlArray(
+            bodyIndex=self.robot,
+            jointIndices=self.joints,
+            controlMode=p.POSITION_CONTROL,
+            targetPositions=all_targets,
+            forces=[200] * len(self.joints),
+            positionGains=[0.25] * len(self.joints),
+            velocityGains=[1.0] * len(self.joints),
+        )
+
+
+def main():
+    p.connect(p.GUI)
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.setGravity(0, 0, -9.8)
+
+    p.loadURDF("plane.urdf")
+
+    robot = p.loadURDF(
+        "a1/a1.urdf",
+        [0, 0, 0.35],
+        p.getQuaternionFromEuler([0, 0, 0])  # ⭐不允许90°侧躺
+    )
+
+    controller = StableA1Trot(robot)
+
+    print("开始稳定 trot...")
+
+    t = 0
+    dt = 1.0 / 240
+
+    while True:
+        controller.step(t)
+        p.stepSimulation()
+        time.sleep(dt)
+        t += dt
+
+
+if __name__ == "__main__":
+    main()
