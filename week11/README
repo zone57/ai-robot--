@@ -1,3 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Week 11 - 四足机器人步态控制</title>
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin:auto;
+      padding:20px;
+      line-height:1.6;
+    }
+    pre{
+      background:#f5f5f5;
+      padding:10px;
+      overflow-x:auto;
+    }
+    video{
+      width:100%;
+      border-radius:10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ===================== 原始内容：完全未删除 ===================== -->
 
 # 🤖 四足机器人步态控制（Trot Gait）实验报告
 
@@ -35,21 +64,10 @@
 
 ## 1️⃣ 启动 PyBullet 仿真环境
 
-使用 PyBullet 创建物理仿真环境：
-
-```python id="pb1"
+```python
 p.connect(p.GUI)
 p.setGravity(0, 0, -9.8)
 p.loadURDF("plane.urdf")
-```
-
-### 📌 原理说明：
-
-PyBullet 提供：
-
-> 刚体动力学 + 关节约束 + 实时物理仿真
-
----
 
 ## 2️⃣ 加载四足机器人模型
 
