@@ -19,7 +19,8 @@
 - [Week 5：Linux 与机器人运动学](week5/)
 - [Week 8：Docker ROS2 环境](week8/)
 - [Week 9：ROS2 小乌龟与 Docker](week9/)
-- [Week 10：OpenCV 实验](week10/)
+- [Week 10：Docker 镜像构建与 ROS2 仿真环境](week10/)
+- [Week 11：四足机器人仿真与强化学习（PyBullet + PPO）](week11/)
 
 ---
 
@@ -28,10 +29,10 @@
 本项目包含：
 
 - ROS2 Humble
-- Docker
-- OpenCV
-- PyBullet
-- GitHub Pages
+- Docker 容器构建与部署
+- OpenCV 图像处理
+- PyBullet 物理仿真
+- GitHub Pages 自动部署
 
 ---
 
@@ -46,4 +47,8 @@
 
 # 项目说明
 
-本项目使用 GitHub Pages 自动部署。
+本项目使用 GitHub Pages 自动部署，持续更新最新实验内容。
+
+当前重点更新：
+- ✔ Week 10：Docker ROS2 镜像与环境搭建
+- ✔ Week 11：四足机器人行走控制与强化学习训练（PPO）
