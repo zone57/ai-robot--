@@ -1,103 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Week 11 - 四足机器人步态控制</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    max-width: 1000px;
+    margin: auto;
+    padding: 30px;
+    line-height: 1.8;
+    background: #f5f7fb;
+    color: #222;
+}
+
+h1{
+    text-align:center;
+    font-size:42px;
+    color:#222;
+    margin-bottom:10px;
+}
+
+h2{
+    margin-top:40px;
+    border-left:6px solid #4a90e2;
+    padding-left:12px;
+    color:#333;
+}
+
+h3{
+    margin-top:25px;
+    color:#444;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    margin-bottom:25px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+pre{
+    background:#272822;
+    color:#f8f8f2;
+    padding:15px;
+    border-radius:10px;
+    overflow-x:auto;
+    font-size:14px;
+}
+
+code{
+    font-family: Consolas;
+}
+
+ul{
+    padding-left:25px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th, table td{
+    border:1px solid #ccc;
+    padding:12px;
+    text-align:center;
+}
+
+table th{
+    background:#4a90e2;
+    color:white;
+}
+
+.highlight{
+    background:#eef6ff;
+    padding:15px;
+    border-radius:10px;
+    border-left:5px solid #4a90e2;
+}
+
+.footer{
+    text-align:center;
+    margin-top:50px;
+    color:#777;
+}
+</style>
+</head>
+
 <body>
 
-<h1>🤖 Week 11 - 四足机器人步态控制（Trot Gait）实验报告</h1>
+<h1>🤖 Week 11</h1>
 
-<h2>📅 实验日期</h2>
+<div class="card">
+
+<h2>四足机器人步态控制（Trot Gait）实验报告</h2>
+
+<h3>📅 实验日期</h3>
 <p>2026-05-20</p>
 
-<hr>
+</div>
+
+<div class="card">
 
 <h2>🧪 一、实验目的</h2>
 
 <ul>
-  <li>学习 PyBullet 机器人仿真环境搭建方法</li>
-  <li>实现四足机器人（A1 / Laikago）的基础 trot 步态控制</li>
-  <li>理解机器人步态生成（gait generation）基本原理</li>
-  <li>掌握逆运动学（IK）在腿部控制中的应用</li>
-  <li>学习机器人姿态稳定控制（roll / pitch correction）方法</li>
-  <li>调试并优化机器人在仿真中的稳定行走能力</li>
+<li>学习 PyBullet 机器人仿真环境搭建方法</li>
+<li>实现四足机器人（A1 / Laikago）的基础 trot 步态控制</li>
+<li>理解机器人步态生成（gait generation）基本原理</li>
+<li>掌握逆运动学（IK）在腿部控制中的应用</li>
+<li>学习机器人姿态稳定控制（roll / pitch correction）方法</li>
+<li>调试并优化机器人在仿真中的稳定行走能力</li>
 </ul>
 
-<hr>
+</div>
+
+<div class="card">
 
 <h2>🖥️ 二、实验环境</h2>
 
 <ul>
-  <li>操作系统：Ubuntu 20.04 / WSL2</li>
-  <li>Python版本：3.10</li>
-  <li>仿真平台：PyBullet</li>
-  <li>机器人模型：A1 / Laikago URDF</li>
-  <li>数值计算库：NumPy</li>
-  <li>图形界面：PyBullet GUI</li>
+<li>操作系统：Ubuntu 20.04 / WSL2</li>
+<li>Python版本：3.10</li>
+<li>仿真平台：PyBullet</li>
+<li>机器人模型：A1 / Laikago URDF</li>
+<li>数值计算库：NumPy</li>
+<li>图形界面：PyBullet GUI (OpenGL / Mesa llvmpipe)</li>
 </ul>
 
-<hr>
+</div>
+
+<div class="card">
 
 <h2>🚀 三、实验步骤</h2>
 
 <h3>1️⃣ 启动 PyBullet 仿真环境</h3>
 
-<pre><code>
-p.connect(p.GUI)
+<pre><code>p.connect(p.GUI)
 p.setGravity(0, 0, -9.8)
-p.loadURDF("plane.urdf")
-</code></pre>
+p.loadURDF("plane.urdf")</code></pre>
 
 <h3>2️⃣ 加载四足机器人模型</h3>
 
-<pre><code>
-robot = p.loadURDF(
+<pre><code>robot = p.loadURDF(
     "a1/a1.urdf",
     [0, 0, 0.35],
     p.getQuaternionFromEuler([0, 0, 0])
-)
-</code></pre>
+)</code></pre>
+
+<div class="highlight">
+初始高度设置为 0.35m，避免机器人加载后直接翻倒。
+</div>
 
 <h3>3️⃣ 关节结构解析</h3>
 
-<pre><code>
-for i in range(p.getNumJoints(robot)):
+<pre><code>for i in range(p.getNumJoints(robot)):
     info = p.getJointInfo(robot, i)
-    print(i, info[1].decode(), info[2])
-</code></pre>
+    print(i, info[1].decode(), info[2])</code></pre>
 
 <h3>4️⃣ trot 步态生成</h3>
 
-<pre><code>
-phase = 2 * np.pi * freq * t
-</code></pre>
+<pre><code>phase = 2 * np.pi * freq * t</code></pre>
 
 <ul>
-  <li>FR + RL：同相</li>
-  <li>FL + RR：反相</li>
+<li>FR + RL：同相</li>
+<li>FL + RR：反相</li>
 </ul>
 
 <h3>5️⃣ 腿部运动轨迹（IK）</h3>
 
-<pre><code>
-x = step_length * sin(phase)
-z = step_height * sin(phase)
-</code></pre>
+<pre><code>x = step_length * sin(phase)
+z = step_height * sin(phase)</code></pre>
 
-<h3>6️⃣ 姿态稳定控制</h3>
+<pre><code>thigh = arctan2(x, height)
+calf = -2 * thigh</code></pre>
 
-<pre><code>
-roll, pitch = getBaseOrientation()
+<h3>6️⃣ 姿态稳定控制（关键改进）</h3>
+
+<pre><code>roll, pitch = getBaseOrientation()
 
 roll_correction = -0.8 * roll
-pitch_correction = -0.8 * pitch
-</code></pre>
+pitch_correction = -0.8 * pitch</code></pre>
 
-<ul>
-  <li>防止侧翻</li>
-  <li>抑制姿态漂移</li>
-  <li>提高动态稳定性</li>
-</ul>
+<div class="highlight">
+加入 roll / pitch 修正后，机器人能够自动纠正身体倾斜。
+</div>
 
 <h3>7️⃣ 统一关节控制</h3>
 
-<pre><code>
-p.setJointMotorControlArray(
+<pre><code>p.setJointMotorControlArray(
     robot,
     jointIndices,
     p.POSITION_CONTROL,
@@ -105,49 +200,182 @@ p.setJointMotorControlArray(
     forces=[200]*len(joints),
     positionGains=[0.25]*len(joints),
     velocityGains=[1.0]*len(joints)
-)
-</code></pre>
+)</code></pre>
 
 <h3>8️⃣ 仿真循环运行</h3>
 
-<pre><code>
-while True:
+<pre><code>while True:
     controller.step(t)
     p.stepSimulation()
-    time.sleep(1./240.)
-</code></pre>
+    time.sleep(1./240.)</code></pre>
 
-<hr>
+</div>
+
+<div class="card">
 
 <h2>📊 四、实验结果</h2>
 
 <ul>
-  <li>✔ 四足机器人成功进入 trot 步态</li>
-  <li>✔ 对角腿协调运动正常</li>
-  <li>✔ 机器人可以短时间维持行走</li>
-  <li>✔ 加入姿态控制后显著减少翻倒</li>
-  <li>✔ 系统在 5~15 秒内保持动态稳定</li>
+<li>✔ 四足机器人成功进入 trot 步态</li>
+<li>✔ 对角腿协调运动正常</li>
+<li>✔ 机器人可以短时间维持行走</li>
+<li>✔ 加入姿态控制后显著减少翻倒</li>
+<li>✔ 系统在 5~15 秒内保持动态稳定</li>
 </ul>
 
-<hr>
+</div>
 
-<h2>🎯 七、实验总结</h2>
+<div class="card">
+
+<h2>📉 五、实验中出现的问题及解决方法</h2>
+
+<h3>❌ 问题1：机器人侧翻</h3>
+
+<p><b>原因：</b></p>
+
+<ul>
+<li>初始姿态错误</li>
+<li>没有平衡控制系统</li>
+</ul>
+
+<p><b>解决方法：</b></p>
+
+<ul>
+<li>设置正确四元数</li>
+<li>加入 roll / pitch 修正</li>
+</ul>
+
+<h3>❌ 问题2：步态不稳定</h3>
+
+<p><b>原因：</b></p>
+
+<ul>
+<li>step_height 过大</li>
+<li>IK 控制过于激进</li>
+</ul>
+
+<p><b>解决方法：</b></p>
+
+<ul>
+<li>减小步长</li>
+<li>降低摆腿高度</li>
+</ul>
+
+</div>
+
+<div class="card">
+
+<h2>🔄 六、新旧代码对比分析（核心改进）</h2>
+
+<h3>🧱 1️⃣ 控制结构变化</h3>
+
+<h4>❌ 老代码</h4>
+
+<pre><code>t → gait → IK → 单关节控制</code></pre>
+
+<ul>
+<li>没有身体状态反馈</li>
+<li>属于开环控制</li>
+<li>容易越走越歪</li>
+</ul>
+
+<h4>✅ 新代码</h4>
+
+<pre><code>t
+ ↓
+trot gait
+ ↓
+IK计算
+ ↓
+balance()
+ ↓
+统一关节控制</code></pre>
+
+<ul>
+<li>加入身体姿态反馈</li>
+<li>拥有平衡修正能力</li>
+<li>稳定性明显提升</li>
+</ul>
+
+<h3>⚖️ 2️⃣ 为什么现在能稳定走路？</h3>
+
+<table>
+<tr>
+<th>改进内容</th>
+<th>作用</th>
+</tr>
+
+<tr>
+<td>加入 roll/pitch 修正</td>
+<td>机器人倾斜时自动纠正</td>
+</tr>
+
+<tr>
+<td>降低 step_height</td>
+<td>减少身体晃动</td>
+</tr>
+
+<tr>
+<td>减小步长</td>
+<td>降低冲击力</td>
+</tr>
+
+<tr>
+<td>统一关节控制</td>
+<td>减少关节不同步问题</td>
+</tr>
+
+<tr>
+<td>相位 trot 控制</td>
+<td>实现稳定对角步态</td>
+</tr>
+
+</table>
+
+<h3>📌 核心原因总结</h3>
+
+<div class="highlight">
+老代码只有“让腿动”，没有“让身体保持平衡”。
+
+新代码加入了姿态反馈控制（Balance Control），系统能够检测机器人是否倾斜，并自动施加修正，因此具备了“自我纠偏能力”。
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🧠 七、核心控制代码</h2>
+
+<pre><code>roll, pitch = getBaseOrientation()
+
+roll_correction = -0.8 * roll
+pitch_correction = -0.8 * pitch
+
+angles[0] += roll_c
+angles[1] += pitch_c</code></pre>
+
+</div>
+
+<div class="card">
+
+<h2>🎯 八、实验总结</h2>
 
 <p>
-成功实现四足机器人 trot 步态控制，
-并加入姿态稳定控制系统。
-</p>
-
-<p>
-实验表明：
+通过本次实验，成功实现了四足机器人在 PyBullet 中的基础 trot 步态控制，并在原始开环控制基础上加入了姿态稳定控制机制。
 </p>
 
 <ul>
-  <li>单纯 IK 无法保证稳定</li>
-  <li>必须加入身体姿态反馈</li>
-  <li>PD 控制对平衡非常重要</li>
-  <li>trot 本质是相位协调 + 平衡控制</li>
+<li>单纯 IK 步态无法保证稳定性</li>
+<li>必须加入身体姿态反馈控制</li>
+<li>关节控制增益对稳定性影响显著</li>
+<li>trot 步态本质是“相位协调 + 平衡控制”</li>
 </ul>
+
+</div>
+
+<div class="footer">
+AI Robotics Homework - Week 11
+</div>
 
 </body>
 </html>
