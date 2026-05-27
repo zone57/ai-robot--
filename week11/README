@@ -40,7 +40,196 @@
 <h2>1️⃣ 启动 PyBullet 仿真环境</h2>
 
 <pre><code>
+import pybullet as p
+import pybullet_data
+
 p.connect(p.GUI)
 p.setGravity(0, 0, -9.8)
+
+p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.loadURDF("plane.urdf")
 </code></pre>
+
+<h2>2️⃣ 加载四足机器人模型</h2>
+
+<pre><code>
+robot = p.loadURDF(
+    "a1/a1.urdf",
+    [0, 0, 0.35]
+)
+</code></pre>
+
+<h2>3️⃣ 设置关节控制</h2>
+
+<pre><code>
+p.setJointMotorControl2(
+    robot,
+    joint_id,
+    p.POSITION_CONTROL,
+    targetPosition=target_angle,
+    force=30
+)
+</code></pre>
+
+<h2>4️⃣ 实现 Trot 步态</h2>
+
+<p>
+采用对角腿同步运动方式：
+</p>
+
+<ul>
+  <li>左前腿（LF） + 右后腿（RR）</li>
+  <li>右前腿（RF） + 左后腿（LR）</li>
+</ul>
+
+<p>
+通过周期性摆动实现机器人前进。
+</p>
+
+<hr>
+
+<h1>🧠 四、核心算法原理</h1>
+
+<h2>1️⃣ Trot 步态原理</h2>
+
+<p>
+Trot（对角步态）是四足机器人中最常用的步态之一。
+机器人会同时移动两条对角腿，
+从而保持较高稳定性。
+</p>
+
+<p>
+该步态具有：
+</p>
+
+<ul>
+  <li>稳定性较高</li>
+  <li>移动速度较快</li>
+  <li>控制结构简单</li>
+  <li>适合强化学习训练</li>
+</ul>
+
+<h2>2️⃣ 圆周运动关系</h2>
+
+<p>
+机器人运动学公式：
+</p>
+
+:contentReference[oaicite:0]{index=0}
+
+<p>
+其中：
+</p>
+
+<ul>
+  <li>v：线速度</li>
+  <li>r：运动半径</li>
+  <li>ω：角速度</li>
+</ul>
+
+<h2>3️⃣ 强化学习 PPO</h2>
+
+<p>
+PPO（Proximal Policy Optimization）
+是一种常见强化学习算法，
+用于优化机器人运动策略。
+</p>
+
+<p>
+强化学习目标：
+</p>
+
+:contentReference[oaicite:1]{index=1}
+
+<p>
+通过奖励函数，
+机器人能够学习更加稳定的运动方式。
+</p>
+
+<hr>
+
+<h1>📊 五、实验结果</h1>
+
+<h2>✅ 成功现象</h2>
+
+<ul>
+  <li>机器人成功完成基础 trot 步态</li>
+  <li>能够保持短时间稳定行走</li>
+  <li>对角腿运动同步效果较好</li>
+  <li>机器人能够实现前进运动</li>
+</ul>
+
+<h2>📷 实验截图</h2>
+
+<p>机器人运动截图：</p>
+
+<img src="./死腿动.png" width="700">
+
+<p>仿真界面：</p>
+
+<img src="./屏幕截图 2026-05-20 123510.png" width="700">
+
+<hr>
+
+<h1>⚠️ 六、存在问题</h1>
+
+<ul>
+  <li>机器人长时间运行后容易失衡</li>
+  <li>高速运动时容易摔倒</li>
+  <li>部分关节存在震荡现象</li>
+  <li>步态切换时稳定性不足</li>
+</ul>
+
+<hr>
+
+<h1>🔧 七、优化方法</h1>
+
+<ul>
+  <li>降低步态频率</li>
+  <li>增加姿态稳定补偿</li>
+  <li>优化腿部摆动轨迹</li>
+  <li>调整 PID 控制参数</li>
+  <li>优化 PPO 奖励函数</li>
+</ul>
+
+<hr>
+
+<h1>🧠 八、实验总结</h1>
+
+<p>
+本实验完成了四足机器人基础 trot 步态控制。
+</p>
+
+<p>
+通过实验学习了：
+</p>
+
+<ul>
+  <li>PyBullet 仿真环境使用</li>
+  <li>四足机器人 gait 控制</li>
+  <li>逆运动学 IK</li>
+  <li>强化学习 PPO</li>
+  <li>机器人稳定性优化方法</li>
+</ul>
+
+<p>
+本实验为后续机器人导航、
+强化学习训练、
+真实机器人控制打下基础。
+</p>
+
+<hr>
+
+<h1>📚 九、相关技术栈</h1>
+
+<ul>
+  <li>ROS2</li>
+  <li>PyBullet</li>
+  <li>PPO Reinforcement Learning</li>
+  <li>Python</li>
+  <li>NumPy</li>
+  <li>Ubuntu / WSL2</li>
+  <li>OpenGL</li>
+</ul>
+
+</body>
