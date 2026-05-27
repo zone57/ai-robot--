@@ -1,9 +1,8 @@
-
 # 🐢 ROS2 Docker 小乌龟实验报告
 
 ## 📅 日期
 
-2026-05-26
+2026-05-06
 
 ---
 
@@ -25,9 +24,9 @@
 
 ---
 
-## 🚀 实验步骤
+# 🚀 实验步骤
 
-### 1️⃣ 启动 Docker 容器
+## 1️⃣ 启动 Docker 容器
 
 在 Windows PowerShell 中输入：
 
@@ -45,7 +44,7 @@ http://127.0.0.1:6080/
 
 ---
 
-### 2️⃣ 打开终端
+## 2️⃣ 打开终端
 
 在网页桌面中打开 Terminal（终端），进入工作目录：
 
@@ -55,7 +54,7 @@ cd /home/ws
 
 ---
 
-### 3️⃣ 启动小乌龟节点（turtlesim）
+## 3️⃣ 启动小乌龟节点（turtlesim）
 
 ```bash
 ros2 run turtlesim turtlesim_node
@@ -65,7 +64,13 @@ ros2 run turtlesim turtlesim_node
 
 ---
 
-### 4️⃣ 启动键盘控制节点
+## 📷 turtlesim 运行界面
+
+![turtlesim](./5.6小乌龟.png)
+
+---
+
+## 4️⃣ 启动键盘控制节点
 
 新开一个终端，输入：
 
@@ -75,7 +80,13 @@ ros2 run turtlesim turtle_teleop_key
 
 ---
 
-### 5️⃣ 控制小乌龟运动
+## 📷 键盘控制界面
+
+![teleop](./5.6.png)
+
+---
+
+## 5️⃣ 控制小乌龟运动
 
 点击控制终端窗口，使用键盘操作：
 
@@ -88,9 +99,15 @@ ros2 run turtlesim turtle_teleop_key
 
 ---
 
-### 6️⃣ 查看 ROS2 通信机制
+## 📷 小乌龟运动轨迹
 
-#### 查看当前节点
+![run](./跑图片.png)
+
+---
+
+## 6️⃣ 查看 ROS2 通信机制
+
+### 查看当前节点
 
 ```bash
 ros2 node list
@@ -105,7 +122,7 @@ ros2 node list
 
 ---
 
-#### 查看话题（Topic）
+### 查看话题（Topic）
 
 ```bash
 ros2 topic list
@@ -120,7 +137,7 @@ ros2 topic list
 
 ---
 
-#### 查看话题数据
+### 查看话题数据
 
 ```bash
 ros2 topic echo /turtle1/pose
@@ -138,9 +155,11 @@ ROS2 使用“节点（Node）+ 话题（Topic）”进行通信：
 * `turtle_teleop_key`：发布控制指令（Publisher）
 * 系统通过 Topic 实现数据传输
 
-👉 核心机制：
+核心机制：
 
-**发布（Publish） → 话题（Topic） → 订阅（Subscribe）**
+```text
+Publish → Topic → Subscribe
+```
 
 ---
 
@@ -158,28 +177,43 @@ ROS2 使用“节点（Node）+ 话题（Topic）”进行通信：
 
 ### 问题 1：无法连接 Docker
 
-**原因**：Docker 未启动
-**解决**：启动 Docker Desktop
+原因：Docker 未启动
+
+解决：
+
+```bash
+启动 Docker Desktop
+```
 
 ---
 
 ### 问题 2：无法访问网页
 
-**原因**：端口未映射
-**解决**：确认使用 `-p 6080:80`
+原因：端口未映射
+
+解决：
+
+```bash
+-p 6080:80
+```
 
 ---
 
 ### 问题 3：路径错误（C:\ 无法访问）
 
-**原因**：Linux 与 Windows 路径不同
-**解决**：使用 `/home/ws` 挂载目录
+原因：Linux 与 Windows 路径不同
+
+解决：
+
+```bash
+cd /home/ws
+```
 
 ---
 
 ### 问题 4：命令找不到
 
-**解决：**
+解决：
 
 ```bash
 source /opt/ros/humble/setup.bash
