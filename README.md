@@ -102,6 +102,10 @@ HTML Travel App
 
 \- WSL2
 
+\- Docker
+
+\- OpenCV
+
 
 
 \---
@@ -116,15 +120,15 @@ HTML Travel App
 
 
 
-!\[robot](./week11/images/robot.png)
+!\[robot](./week11/死腿动.png)
 
 
 
-\## Trot 步态
+\## Trot 步态控制
 
 
 
-!\[trot](./week11/images/trot.png)
+!\[trot](./week11/屏幕截图%202026-05-20%20123510.png)
 
 
 
@@ -136,11 +140,43 @@ HTML Travel App
 
 
 
-强化学习目标函数：
+强化学习累计奖励函数：
 
 
 
 :contentReference\[oaicite:0]{index=0}
+
+
+
+PPO 优化目标：
+
+
+
+:contentReference\[oaicite:1]{index=1}
+
+
+
+\---
+
+
+
+\# 项目特色
+
+
+
+\- ROS2 Topic 通信
+
+\- TurtleSim 控制
+
+\- OpenCV 图像处理
+
+\- Docker 容器实验
+
+\- 四足机器人步态控制
+
+\- PPO 强化学习训练
+
+\- GitHub Pages 自动部署
 
 
 
@@ -157,6 +193,12 @@ HTML Travel App
 
 
 \- ROS2 通信机制
+
+\- Linux 与 Ubuntu
+
+\- Docker 基础
+
+\- OpenCV 图像处理
 
 \- 四足机器人控制
 
