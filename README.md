@@ -42,13 +42,13 @@
 
 ## 🤖 四足机器人
 
-![robot](./week11/死腿动.png)
+![robot](./week11/robot.png)
 
 ---
 
 ## 🐕 Trot 步态控制
 
-![trot](./week11/屏幕截图%202026-05-20%20123510.png)
+![trot](./week11/trot.png)
 
 ---
 
