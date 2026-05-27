@@ -6,7 +6,7 @@
 
 ---
 
-## 🧪 实验目的
+# 🧪 实验目的
 
 * 学习 Docker 容器的基本操作
 * 掌握 ROS2 Docker 图形环境运行方法
@@ -16,13 +16,17 @@
 
 ---
 
-## 🖥️ 实验环境
+# 🖥️ 实验环境
 
-* 操作系统：Windows 10
-* 工具：Docker Desktop + WSL2
-* Docker 镜像：ghcr.io/tiryoh/ros2-desktop-vnc:humble
-* ROS版本：ROS2 Humble
-* Python版本：Python 3.10
+| 项目 | 内容 |
+|---|---|
+| 操作系统 | Windows 10 + WSL2 |
+| Docker版本 | Docker Desktop |
+| ROS版本 | ROS2 Humble |
+| Python版本 | Python 3.10 |
+| 仿真平台 | PyBullet |
+| 图像处理库 | OpenCV |
+| Docker镜像 | ghcr.io/tiryoh/ros2-desktop-vnc:humble |
 
 ---
 
@@ -42,7 +46,13 @@ docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m ghcr.io/
 http://127.0.0.1:6080/
 ```
 
-进入 Ubuntu 图形桌面环境。
+成功进入 Ubuntu 图形桌面环境。
+
+---
+
+## 📷 Docker 图形环境
+
+![docker_gui](./Docker 环境配置.png)
 
 ---
 
@@ -182,6 +192,12 @@ sha256:ef3ae3325bc9...
 
 ---
 
+## 📷 新 Docker 镜像
+
+![docker_image](./新镜像.png)
+
+---
+
 ## 9️⃣ 查看保存的镜像
 
 输入：
@@ -218,13 +234,19 @@ Docker 是一种轻量级容器技术，可以快速部署统一的软件开发�
 
 # 🎯 实验结果
 
-* 成功启动 ROS2 Docker 图形环境
-* 成功进入 Docker Linux 容器
-* 成功安装 PyBullet
-* 成功安装 OpenCV
-* 成功解决 NumPy 兼容问题
-* 成功保存新的 Docker 镜像
-* 成功构建 ROS2 + OpenCV + PyBullet 完整开发环境
+✅ 成功启动 ROS2 Docker 图形环境
+
+✅ 成功进入 Docker Linux 容器
+
+✅ 成功安装 PyBullet
+
+✅ 成功安装 OpenCV
+
+✅ 成功解决 NumPy 兼容问题
+
+✅ 成功保存新的 Docker 镜像
+
+✅ 成功构建 ROS2 + OpenCV + PyBullet 完整开发环境
 
 ---
 
@@ -292,6 +314,39 @@ docker start 4ee704c91d43
 
 ---
 
+# 📘 实验收获
+
+通过本实验，我不仅掌握了 Docker 容器的基本操作，
+还学习了 ROS2 Docker 图形环境部署方法。
+
+同时理解了：
+
+* Docker 镜像与容器关系
+* OpenCV 图像处理库安装方法
+* PyBullet 机器人物理仿真平台
+* Python 科学计算环境兼容问题
+* Docker 开发环境保存与迁移
+
+本实验为后续机器人视觉、
+强化学习、
+四足机器人控制实验提供了完整开发环境。
+
+---
+
+# 🚀 后续计划
+
+后续将在该 Docker 环境中继续完成：
+
+* ROS2 Topic 通信实验
+* OpenCV 图像识别实验
+* PyBullet 四足机器人控制
+* PPO 强化学习训练
+* 机器人视觉导航实验
+
+---
+
 # 🧾 实验总结
 
-通过本次实验，我掌握了 Docker 容器的基本使用方法，并成功在 ROS2 Docker 环境中安装配置了 PyBullet 与 OpenCV 库。实验过程中学习了 Docker 容器管理、镜像保存、Python 库安装以及环境兼容性问题的解决方法。同时理解了 Docker 在机器人开发中的重要作用，为后续 ROS2、计算机视觉与机器人仿真开发打下了基础。
+通过本次实验，我成功构建了基于 Docker 的 ROS2 机器人开发环境，并完成了 OpenCV 与 PyBullet 的安装配置。
+
+实验过程中学习了 Docker 容器管理、镜像保存、Python 库安装以及环境兼容性问题解决方法。同时理解了 Docker 在机器人开发中的重要作用，为后续 ROS2、计算机视觉与机器人仿真开发打下基础。
