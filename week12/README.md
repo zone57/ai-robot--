@@ -1,9 +1,3 @@
-这个版本已经可以交了，但建议你把你后面真正完成的 **ArUco 检测 + 手机 Camera Bridge + Tailscale 访问** 也加入进去，不然老师会觉得你只做了“环境配置”。
-
-你可以直接替换成下面这个“增强版总结”，更像真正完成实验的人写的。
-
----
-
 # 🤖 AI Robotics 周报（Week 12 实验进度）
 
 ## 📅 日期
@@ -281,3 +275,23 @@ DICT_4X4_1000
 * 学习位姿估计（Pose Estimation）
 * 优化图像传输延迟
 * 完成 Week 13 四足机器人实验准备
+
+---
+
+# 🖼️ 实验截图
+
+## Camera Bridge 页面
+
+![monitor](./images/monitor_window.png)
+
+---
+
+## 图像识别结果
+
+![result](./images/monitor_result.png)
+
+---
+
+## ArUco Marker 检测
+
+![circle](./images/circle.png)
