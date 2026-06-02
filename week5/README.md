@@ -47,12 +47,9 @@ self.create_subscription(
 
 ## 监视器窗口
 
-![监视器窗口](./监测小窗口.png)
+![监视器窗口](./monitor_window.png)
 
-## 数据输出
-
-![数据输出](./监测2.png)
-
+![数据输出](./monitor_result.png)
 ---
 
 # 🎥 视频演示
