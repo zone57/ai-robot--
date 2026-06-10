@@ -17,11 +17,14 @@
 - [Week 3：机器人运动控制](week3/)
 - [Week 4：Python 与 PyBullet](week4/)
 - [Week 5：Linux 与机器人运动学](week5/)
+- [Week 6：实验与练习（待补充）](week6/)
+- [Week 7：实验与说明](week7/)
 - [Week 8：Docker ROS2 环境](week8/)
 - [Week 9：ROS2 小乌龟与 Docker](week9/)
 - [Week 10：Docker 镜像构建与 OpenCV、PyBullet](week10/)
 - [Week 11：四足机器人仿真与 PPO 强化学习](week11/)
 - [Week 12：摄像头标定与 Camera Bridge（Flask + SocketIO 实时图像传输）](week12/)
+- [Week 13：新增内容与总结](week13/)
 
 ---
 
