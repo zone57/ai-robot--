@@ -25,7 +25,7 @@
 - [Week 11：四足机器人仿真与 PPO 强化学习](week11/)
 - [Week 12：摄像头标定与 Camera Bridge（Flask + SocketIO 实时图像传输）](week12/)
 - [Week 13：新增内容与总结](week13/)
-
+- [Week 14：ROS2 Turtlesim Remote Control Project](./week14/)
 ---
 
 # 技术栈
